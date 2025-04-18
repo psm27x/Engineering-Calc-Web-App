@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Engineering Calculator{% endblock %}
+
+{% block content %}
+<section class="home-section">
+    <h2>Welcome to the Automated Engineering Calculation & Simulation App</h2>
+    <p>Select a module below to perform specialized engineering calculations.</p>
+
+    <div class="module-grid">
+        <!-- Civil Engineering -->
+        <div class="module-card">
+            <img src="{{ url_for('static', filename='images/Civil.png') }}" alt="Civil Engineering">
+            <h3>Civil Engineering</h3>
+            <p>Calculate beam deflection, bending stress, and moment of inertia.</p>
+            <a href="{{ url_for('civil.civil_page') }}" class="btn">Civil</a>
+        </div>
+
+        <!-- Electrical Engineering -->
+        <div class="module-card">
+            <img src="{{ url_for('static', filename='images/Electrical.png') }}" alt="Electrical Engineering">
+            <h3>Electrical Engineering</h3>
+            <p>Calculate voltage, resistance, and power.</p>
+            <a href="{{ url_for('electrical.electrical_page') }}" class="btn">Electrical</a>
+        </div>
+
+        <!-- Mechanical Engineering -->
+        <div class="module-card">
+            <img src="{{ url_for('static', filename='images/Mechanical.png') }}" alt="Mechanical Engineering">
+            <h3>Mechanical Engineering</h3>
+            <p>Calculate force, work, and torque.</p>
+            <a href="{{ url_for('mechanical.mechanical_page') }}" class="btn">Mechanical</a>
+        </div>
+
+        <!-- ✅ History Module -->
+        <div class="module-card">
+            <img src="{{ url_for('static', filename='images/history-banner.png') }}" alt="History">
+            <h3>History</h3>
+            <p>View all your previous calculations across all modules.</p>
+            <a href="/history" class="btn">View History</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

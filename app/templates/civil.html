@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Civil Engineering{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container mt-5 mb-5" style="max-width: 800px;">
+    <section class="calculation-form p-4 bg-white shadow rounded">
+        <h2 class="text-center mb-4">Civil Engineering Calculations</h2>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="calculation"><strong>Choose Calculation:</strong></label>
+                <select class="form-control" name="calculation" id="calculation" onchange="showFields()" required>
+                    <option value="">Select</option>
+                    <option value="beam_deflection" {% if calc_type == 'beam_deflection' %}selected{% endif %}>Beam Deflection</option>
+                    <option value="bending_stress" {% if calc_type == 'bending_stress' %}selected{% endif %}>Bending Stress</option>
+                    <option value="moment_inertia" {% if calc_type == 'moment_inertia' %}selected{% endif %}>Moment of Inertia</option>
+                    <option value="slenderness_ratio" {% if calc_type == 'slenderness_ratio' %}selected{% endif %}>Slenderness Ratio</option>
+                    <option value="shear_stress" {% if calc_type == 'shear_stress' %}selected{% endif %}>Shear Stress</option>
+                    <option value="concrete_volume" {% if calc_type == 'concrete_volume' %}selected{% endif %}>Concrete Volume</option>
+                </select>
+            </div>
+
+            <!-- Beam Deflection -->
+            <div id="beam_deflection_fields" style="display:none;">
+                <h5 class="mt-4">Beam Deflection <i class="bi bi-arrow-down-up"></i></h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-lightning-charge-fill"></i></span>
+                        <input class="form-control" name="force" type="number" step="any" placeholder="Force" value="{{ request.form.force or '' }}">
+                        <span class="input-group-text">N</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+                        <input class="form-control" name="length" type="number" step="any" placeholder="Length" value="{{ request.form.length or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-diagram-3"></i></span>
+                        <input class="form-control" name="inertia" type="number" step="any" placeholder="Inertia" value="{{ request.form.inertia or '' }}">
+                        <span class="input-group-text">m⁴</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-bezier2"></i></span>
+                        <input class="form-control" name="modulus" type="number" step="any" placeholder="Modulus" value="{{ request.form.modulus or '' }}">
+                        <span class="input-group-text">Pa</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bending Stress -->
+            <div id="bending_stress_fields" style="display:none;">
+                <h5 class="mt-4">Bending Stress <i class="bi bi-box-arrow-down-right"></i></h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-activity"></i></span>
+                        <input class="form-control" name="moment" type="number" step="any" placeholder="Moment" value="{{ request.form.moment or '' }}">
+                        <span class="input-group-text">Nm</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrows-collapse"></i></span>
+                        <input class="form-control" name="distance" type="number" step="any" placeholder="Distance" value="{{ request.form.distance or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-diagram-3"></i></span>
+                    <input class="form-control" name="section_modulus" type="number" step="any" placeholder="Section Modulus" value="{{ request.form.section_modulus or '' }}">
+                    <span class="input-group-text">m³</span>
+                </div>
+            </div>
+
+            <!-- Moment of Inertia -->
+            <div id="moment_inertia_fields" style="display:none;">
+                <h5 class="mt-4">Moment of Inertia <i class="bi bi-slash-circle"></i></h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-square"></i></span>
+                        <input class="form-control" name="base" type="number" step="any" placeholder="Base" value="{{ request.form.base or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrow-bar-up"></i></span>
+                        <input class="form-control" name="height" type="number" step="any" placeholder="Height" value="{{ request.form.height or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slenderness Ratio -->
+            <div id="slenderness_ratio_fields" style="display:none;">
+                <h5 class="mt-4">Slenderness Ratio <i class="bi bi-rulers"></i></h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+                        <input class="form-control" name="length_sr" type="number" step="any" placeholder="Length" value="{{ request.form.length_sr or '' }}">
+                        <span class="input-group-text">mm</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-circle-half"></i></span>
+                        <input class="form-control" name="radius_sr" type="number" step="any" placeholder="Radius" value="{{ request.form.radius_sr or '' }}">
+                        <span class="input-group-text">mm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shear Stress -->
+            <div id="shear_stress_fields" style="display:none;">
+                <h5 class="mt-4">Shear Stress <i class="bi bi-graph-up-arrow"></i></h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrow-up"></i></span>
+                        <input class="form-control" name="force_ss" type="number" step="any" placeholder="Force" value="{{ request.form.force_ss or '' }}">
+                        <span class="input-group-text">N</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-square"></i></span>
+                        <input class="form-control" name="area_ss" type="number" step="any" placeholder="Area" value="{{ request.form.area_ss or '' }}">
+                        <span class="input-group-text">m²</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Concrete Volume -->
+            <div id="concrete_volume_fields" style="display:none;">
+                <h5 class="mt-4">Concrete Slab Volume <i class="bi bi-box-seam"></i></h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrows-expand-vertical"></i></span>
+                        <input class="form-control" name="length_cv" type="number" step="any" placeholder="Length" value="{{ request.form.length_cv or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrows-expand"></i></span>
+                        <input class="form-control" name="width_cv" type="number" step="any" placeholder="Width" value="{{ request.form.width_cv or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                    <div class="col input-group">
+                        <span class="input-group-text"><i class="bi bi-arrow-down"></i></span>
+                        <input class="form-control" name="depth_cv" type="number" step="any" placeholder="Depth" value="{{ request.form.depth_cv or '' }}">
+                        <span class="input-group-text">m</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary flex-grow-1">Calculate</button>
+                <a href="" class="btn btn-secondary flex-grow-1">Clear</a>
+            </div>
+
+            <!-- Result -->
+            {% if result %}
+            <div class="alert text-center mt-4 
+                {% if calc_type == 'beam_deflection' %}alert-info
+                {% elif calc_type == 'bending_stress' %}alert-warning
+                {% elif calc_type == 'moment_inertia' %}alert-secondary
+                {% elif calc_type == 'slenderness_ratio' %}alert-success
+                {% elif calc_type == 'shear_stress' %}alert-danger
+                {% elif calc_type == 'concrete_volume' %}alert-primary
+                {% else %}alert-success
+                {% endif %}" id="result-box">
+                <strong>Result:</strong> {{ result }}
+            </div>
+            {% endif %}
+        </form>
+
+        {% if plot_url %}
+        <div class="text-center mt-4">
+            <img src="{{ plot_url }}" alt="Deflection Plot" class="img-fluid">
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<script>
+    function showFields() {
+        const selected = document.getElementById('calculation').value;
+        const sections = ['beam_deflection', 'bending_stress', 'moment_inertia', 'slenderness_ratio', 'shear_stress', 'concrete_volume'];
+        sections.forEach(sec => {
+            const field = document.getElementById(`${sec}_fields`);
+            if (field) field.style.display = (selected === sec) ? 'block' : 'none';
+        });
+    }
+
+    window.onload = showFields;
+</script>
+{% endblock %}

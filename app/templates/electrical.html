@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Electrical Engineering{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<div class="container mt-5 mb-5" style="max-width: 700px;">
+    <section class="calculation-form p-4 bg-white shadow rounded">
+        <h2 class="text-center mb-4">Electrical Engineering Calculations</h2>
+
+        <form method="POST">
+            <!-- Dropdown -->
+            <div class="form-group">
+                <label><strong>Choose Calculation:</strong></label>
+                <select class="form-control" name="calculation" id="calculation" onchange="showFields()" required>
+                    <option value="">Select</option>
+                    <option value="voltage" {% if calc_type == 'voltage' %}selected{% endif %}>Voltage (V = I × R)</option>
+                    <option value="current" {% if calc_type == 'current' %}selected{% endif %}>Current (I = V / R)</option>
+                    <option value="power" {% if calc_type == 'power' %}selected{% endif %}>Power (P = V × I)</option>
+                    <option value="resistance" {% if calc_type == 'resistance' %}selected{% endif %}>Resistance (R = V / I)</option>
+                    <option value="energy" {% if calc_type == 'energy' %}selected{% endif %}>Energy (E = P × t)</option>
+                    <option value="capacitor_energy" {% if calc_type == 'capacitor_energy' %}selected{% endif %}>Capacitor Energy (E = ½ C × V²)</option>
+                </select>
+            </div>
+
+            <!-- Voltage -->
+            <div id="voltage_fields" style="display:none;">
+                <h5 class="mt-4">Voltage</h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <input class="form-control" name="current_v" type="number" step="any" placeholder="Current" value="{{ request.form.current_v or '' }}">
+                        <span class="input-group-text">A</span>
+                    </div>
+                    <div class="col input-group">
+                        <input class="form-control" name="resistance_v" type="number" step="any" placeholder="Resistance" value="{{ request.form.resistance_v or '' }}">
+                        <span class="input-group-text">Ω</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current -->
+            <div id="current_fields" style="display:none;">
+                <h5 class="mt-4">Current</h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <input class="form-control" name="voltage_i" type="number" step="any" placeholder="Voltage" value="{{ request.form.voltage_i or '' }}">
+                        <span class="input-group-text">V</span>
+                    </div>
+                    <div class="col input-group">
+                        <input class="form-control" name="resistance_i" type="number" step="any" placeholder="Resistance" value="{{ request.form.resistance_i or '' }}">
+                        <span class="input-group-text">Ω</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power -->
+            <div id="power_fields" style="display:none;">
+                <h5 class="mt-4">Power</h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <input class="form-control" name="voltage_p" type="number" step="any" placeholder="Voltage" value="{{ request.form.voltage_p or '' }}">
+                        <span class="input-group-text">V</span>
+                    </div>
+                    <div class="col input-group">
+                        <input class="form-control" name="current_p" type="number" step="any" placeholder="Current" value="{{ request.form.current_p or '' }}">
+                        <span class="input-group-text">A</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resistance -->
+            <div id="resistance_fields" style="display:none;">
+                <h5 class="mt-4">Resistance</h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <input class="form-control" name="voltage_r" type="number" step="any" placeholder="Voltage" value="{{ request.form.voltage_r or '' }}">
+                        <span class="input-group-text">V</span>
+                    </div>
+                    <div class="col input-group">
+                        <input class="form-control" name="current_r" type="number" step="any" placeholder="Current" value="{{ request.form.current_r or '' }}">
+                        <span class="input-group-text">A</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Energy -->
+            <div id="energy_fields" style="display:none;">
+                <h5 class="mt-4">Energy</h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <input class="form-control" name="power_e" type="number" step="any" placeholder="Power" value="{{ request.form.power_e or '' }}">
+                        <span class="input-group-text">W</span>
+                    </div>
+                    <div class="col input-group">
+                        <input class="form-control" name="time_e" type="number" step="any" placeholder="Time" value="{{ request.form.time_e or '' }}">
+                        <span class="input-group-text">s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capacitor Energy -->
+            <div id="capacitor_energy_fields" style="display:none;">
+                <h5 class="mt-4">Capacitor Energy</h5>
+                <div class="row mb-3">
+                    <div class="col input-group">
+                        <input class="form-control" name="capacitance" type="number" step="any" placeholder="Capacitance" value="{{ request.form.capacitance or '' }}">
+                        <span class="input-group-text">F</span>
+                    </div>
+                    <div class="col input-group">
+                        <input class="form-control" name="voltage_c" type="number" step="any" placeholder="Voltage" value="{{ request.form.voltage_c or '' }}">
+                        <span class="input-group-text">V</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary w-100">Calculate</button>
+                <a href="" class="btn btn-secondary w-100">Clear</a>
+            </div>
+
+            {% if result %}
+            <div class="alert text-center mt-4
+                {% if calc_type == 'voltage' %}alert-info
+                {% elif calc_type == 'current' %}alert-success
+                {% elif calc_type == 'power' %}alert-warning
+                {% elif calc_type == 'resistance' %}alert-secondary
+                {% elif calc_type == 'energy' %}alert-primary
+                {% elif calc_type == 'capacitor_energy' %}alert-danger
+                {% else %}alert-success
+                {% endif %}">
+                <strong>Result:</strong> {{ result }}
+            </div>
+            {% endif %}
+        </form>
+    </section>
+</div>
+
+<script>
+    function showFields() {
+        const selected = document.getElementById('calculation').value;
+        const sections = ['voltage', 'current', 'power', 'resistance', 'energy', 'capacitor_energy'];
+        sections.forEach(sec => {
+            document.getElementById(`${sec}_fields`).style.display = (selected === sec) ? 'block' : 'none';
+        });
+    }
+
+    window.onload = showFields;
+</script>
+{% endblock %}
